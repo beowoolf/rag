@@ -13,7 +13,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>rag</name>
-	<description>RAG demonstration project using Spring AI</description>
+	<description>An example project using Retrieval-Augmented Generation for more efficient operation.</description>
 	<url/>
 	<licenses>
 		<license/>
