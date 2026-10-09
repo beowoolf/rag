@@ -1,0 +1,41 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: rag:0.0.1-SNAPSHOT
+    container_name: rag-app
+    depends_on:
+      pgvector:
+        condition: service_healthy
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:?Set OPENAI_API_KEY before running docker compose}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://pgvector:5432/mydatabase
+      SPRING_DATASOURCE_USERNAME: myuser
+      SPRING_DATASOURCE_PASSWORD: secret
+      # The application runs inside Compose, so it must not try to start compose.yaml itself
+      SPRING_DOCKER_COMPOSE_ENABLED: "false"
+    ports:
+      - "8888:8888"
+    restart: unless-stopped
+
+  pgvector:
+    image: pgvector/pgvector:pg16
+    container_name: rag-pgvector
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgvector-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d mydatabase"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  pgvector-data:
